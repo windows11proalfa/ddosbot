@@ -1,0 +1,16 @@
+{
+  "name": "salzgpt-node-bot",
+  "version": "1.0.0",
+  "description": "Elite Cyber Assistant Bot - Node.js Implementation",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "author": "Jinwooll",
+  "license": "ISC",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "net": "latest",
+    "http": "latest"
+  }
+}
