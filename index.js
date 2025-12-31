@@ -6,7 +6,7 @@ const net = require('net');
 const http = require('http');
 
 // --- KONFIGURASI ---
-const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; // Ganti dengan token bot Anda
+const BOT_TOKEN = "8522639108:AAGFgk9CHoKX9Owgu1sj1o9PAYZOZdDEnUI"; // Ganti dengan token bot Anda
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
