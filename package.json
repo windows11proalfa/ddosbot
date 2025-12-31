@@ -2,9 +2,9 @@
   "name": "salzgpt-node-bot",
   "version": "1.0.0",
   "description": "Elite Cyber Assistant Bot - Node.js Implementation",
-  "main": "bot.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node index.js"
   },
   "author": "Jinwooll",
   "license": "ISC",
