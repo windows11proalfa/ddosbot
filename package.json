@@ -13,6 +13,7 @@
     "crypto": "latest",
     "http": "latest",
     "net": "latest",
-    "dgram": "latest"
+    "dgram": "latest",
+    "puppeteer": "latest"
   }
 }
